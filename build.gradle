@@ -49,6 +49,7 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			from components.java
+            artifactId 'jspm-grails-gradle'
 		}
 	}
 	repositories {
