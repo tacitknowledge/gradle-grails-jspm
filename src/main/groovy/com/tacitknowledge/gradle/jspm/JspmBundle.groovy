@@ -33,7 +33,7 @@ class JspmBundle extends JspmTask
     project.jspm?.bundles?.each { bundle, definition ->
       println "Doing bundle for: [$definition] - [$bundle]"
       args = ['bundle', definition, "../assets/bundles/${bundle}.${hash}.js", '--inject', '--minify']
-      Object.exec()
+      super.exec()
     }
 
     //minify config
