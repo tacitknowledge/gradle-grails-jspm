@@ -45,6 +45,22 @@ dependencies {
 	testCompile('org.spockframework:spock-core:0.7-groovy-2.0')
 }
 
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+	repositories {
+		maven {
+			url "${nexusURL}/content/repositories/${project.version.endsWith('-SNAPSHOT') ? 'snapshots' : 'release'}"
+			credentials {
+				username = nexusUser
+				password = nexusPassword
+			}
+		}
+	}
+}
 /*
 publishing {
 	publications {
