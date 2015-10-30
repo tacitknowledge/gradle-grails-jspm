@@ -28,17 +28,18 @@ class MergePackageDefinitionsTask extends DefaultTask
   @TaskAction
   void merge()
   {
-    def dependenciesFromJars = findDependencyJars().collect{ new JarFile(it) }.collectEntries {
-      parse(it, it.getEntry(PACKAGE_JSON_LOCATION)).dependencies
+    def allDefinitions = findDependencyJars().collect{ extractPackageJson(new JarFile(it)) }
+    allDefinitions << slurper.parse(Paths.get(project.projectDir.path, project.jspm.packageConfigPath, 'package.json').toFile())
+
+    def mergedDefinition = allDefinitions.inject(new TreeMap<>()) { result, source ->
+      source.each { k, v ->
+        result[k] = (result[k] instanceof Map) ? (result[k]+v) : v
+      }
+      result
     }
-    def myPkgJson = slurper.parse(Paths.get(project.projectDir.path, project.jspm.packageConfigPath, 'package.json').toFile())
-    myPkgJson.dependencies = myPkgJson.dependencies ?: [:]
-    def tmpDeps = new HashMap(myPkgJson.dependencies)
-    myPkgJson.dependencies << dependenciesFromJars
-    myPkgJson.dependencies << tmpDeps
 
     Paths.get(project.buildDir.path, project.jspm.buildDir, 'jspm').toFile().mkdirs()
-    Paths.get(project.buildDir.path, project.jspm.buildDir, 'jspm', 'package.json').text = JsonOutput.toJson(myPkgJson)
+    Paths.get(project.buildDir.path, project.jspm.buildDir, 'jspm', 'package.json').text = JsonOutput.toJson(mergedDefinition)
   }
 
   //TODO this doesn't sort in dep order
@@ -49,11 +50,12 @@ class MergePackageDefinitionsTask extends DefaultTask
     (runtimeFiles + providedFiles).grep{ !it.exists() || new JarFile(it).getJarEntry(PACKAGE_JSON_LOCATION) }
   }
 
-  def parse(JarFile jar, ZipEntry entry)
+  def extractPackageJson(JarFile jar)
   {
-    if (entry)
+    def zipEntry = jar.getEntry(PACKAGE_JSON_LOCATION)
+    if (zipEntry)
     {
-      slurper.parse(jar.getInputStream(entry))
+      slurper.parse(jar.getInputStream(zipEntry))
     }
   }
 }

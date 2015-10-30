@@ -16,6 +16,7 @@ class JspmInstall extends JspmTask
   @Override
   void exec()
   {
+    project.delete("${project.buildDir}/${project.jspm.buildDir}/assets/jspm-config.js")
     args = ['dl-loader', project.jspm.loader, '-y']
     super.exec()
 
