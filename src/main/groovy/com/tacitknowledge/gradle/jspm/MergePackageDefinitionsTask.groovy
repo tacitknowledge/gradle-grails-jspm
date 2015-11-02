@@ -31,9 +31,9 @@ class MergePackageDefinitionsTask extends DefaultTask
     def allDefinitions = findDependencyJars().collect{ extractPackageJson(new JarFile(it)) }
     allDefinitions << slurper.parse(Paths.get(project.projectDir.path, project.jspm.packageConfigPath, 'package.json').toFile())
 
-    def mergedDefinition = allDefinitions.inject(new TreeMap<>()) { result, source ->
+    def mergedDefinition = allDefinitions.inject(new LinkedHashMap()) { result, source ->
       source.each { k, v ->
-        result[k] = (result[k] instanceof Map) ? (result[k]+v) : v
+        result[k] = (result[k] instanceof Map) ? (result[k]+v) : (v instanceof Map ? v as LinkedHashMap : v)
       }
       result
     }
