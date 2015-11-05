@@ -16,7 +16,12 @@ class JspmGrailsPlugin implements Plugin<Project>
 
     project.extensions.create('jspm', JspmGrailsExtension)
 
-    project.node.download = project.jspm.downloadNode
+    if(project.jspm?.downloadNode != null) {
+      project.node.download = project.jspm.downloadNode
+    } else {
+      //Download node by default
+      project.node.download = true
+    }
 
     project.tasks.with {
       def installJspm = create(
