@@ -9,10 +9,10 @@ class InstallJspm extends NpmTask
     group = 'Jspm'
     description = 'Installs jspm bin (node) into project'
 
-    def pkgName = project.jspm.version ? "jspm@${project.jspm.version}" : 'jspm'
-    args = ['install', pkgName]
-
     project.afterEvaluate{
+      def pkgName = project.jspm.version ? "jspm@${project.jspm.version}" : 'jspm'
+      args = ['install', pkgName]
+
       workingDir = project.node.nodeModulesDir
       outputs.dir new File(project.node.nodeModulesDir, 'node_modules/jspm' )
     }

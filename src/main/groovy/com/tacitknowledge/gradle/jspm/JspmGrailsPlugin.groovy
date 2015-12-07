@@ -1,4 +1,5 @@
 package com.tacitknowledge.gradle.jspm
+
 import com.moowork.gradle.node.NodePlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -15,13 +16,6 @@ class JspmGrailsPlugin implements Plugin<Project>
     project.plugins.apply(NodePlugin)
 
     project.extensions.create('jspm', JspmGrailsExtension)
-
-    if(project.jspm?.downloadNode != null) {
-      project.node.download = project.jspm.downloadNode
-    } else {
-      //Download node by default
-      project.node.download = true
-    }
 
     project.tasks.with {
       def installJspm = create(
@@ -67,9 +61,8 @@ class JspmGrailsPlugin implements Plugin<Project>
               type: JspmBundle,
               dependsOn: [gatherAssetsTask, jspmInstall])
 
-
       //Wire into the process
-      project.tasks.withType(War) { War bundleTask ->
+      withType(War) { War bundleTask ->
         bundleTask.dependsOn jspmBundle
         bundleTask.from "${project.buildDir}/${project.jspm.buildDir}/assets/bundles", {
           into "assets/bundles"
@@ -81,14 +74,15 @@ class JspmGrailsPlugin implements Plugin<Project>
           into "assets"
         }
       }
-      project.tasks.findByName('run')?.dependsOn jspmInstall
-    }
 
-    project.tasks.withType(Jar) { Jar bundleTask ->
-      def jspmDir = Paths.get(project.projectDir.path, project.jspm.packageConfigPath).toFile()
-      bundleTask.inputs.dir jspmDir
-      bundleTask.from jspmDir, {
-        into "META-INF/jspm"
+      findByName('run')?.dependsOn jspmInstall
+
+      withType(Jar) { Jar bundleTask ->
+        def jspmDir = Paths.get(project.projectDir.path, project.jspm.packageConfigPath).toFile()
+        bundleTask.inputs.dir jspmDir
+        bundleTask.from jspmDir, {
+          into "META-INF/jspm"
+        }
       }
     }
 
