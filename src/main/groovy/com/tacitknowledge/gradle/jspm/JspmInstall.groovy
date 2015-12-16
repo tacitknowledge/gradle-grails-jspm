@@ -2,6 +2,7 @@ package com.tacitknowledge.gradle.jspm
 
 import groovy.json.JsonOutput
 import groovy.json.JsonSlurper
+import org.apache.commons.io.FileUtils
 
 class JspmInstall extends JspmTask
 {
@@ -20,8 +21,11 @@ class JspmInstall extends JspmTask
   void exec()
   {
     project.delete("${project.buildDir}/${project.jspm.buildDir}/assets/jspm-config.js")
+    FileUtils.copyFile(new File("${project.buildDir}/${project.jspm.buildDir}/jspm/package.json"), new File("${project.buildDir}/${project.jspm.buildDir}/jspm/package.json_bak"))
     args = ['dl-loader', project.jspm.loader, '-y']
     super.exec()
+    FileUtils.forceDelete(new File("${project.buildDir}/${project.jspm.buildDir}/jspm/package.json"))
+    FileUtils.moveFile(new File("${project.buildDir}/${project.jspm.buildDir}/jspm/package.json_bak"), new File("${project.buildDir}/${project.jspm.buildDir}/jspm/package.json"))
 
     def config = new JsonSlurper().parse(new File("${project.buildDir}/${project.jspm.buildDir}/jspm/package.json"))
 
