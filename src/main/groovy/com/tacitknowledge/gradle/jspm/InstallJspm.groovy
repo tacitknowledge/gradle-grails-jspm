@@ -4,17 +4,19 @@ import com.moowork.gradle.node.task.NpmTask
 
 class InstallJspm extends NpmTask
 {
-  InstallJspm()
-  {
+  InstallJspm() {
     group = 'Jspm'
     description = 'Installs jspm bin (node) into project'
 
-    project.afterEvaluate{
+    project.afterEvaluate {
       def pkgName = project.jspm.version ? "jspm@${project.jspm.version}" : 'jspm'
       args = ['install', pkgName]
 
       workingDir = project.node.nodeModulesDir
-      outputs.dir new File(project.node.nodeModulesDir, 'node_modules/jspm' )
+
+      def jspmDir = new File(project.node.nodeModulesDir, 'node_modules/jspm')
+      outputs.dir jspmDir
+      enabled = !jspmDir.exists()
     }
   }
 }
