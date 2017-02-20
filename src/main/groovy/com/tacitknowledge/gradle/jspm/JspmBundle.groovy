@@ -29,6 +29,11 @@ class JspmBundle extends JspmTask
   @Override
   void exec()
   {
+    project.jspm?.depcache?.each { definition ->
+      println "Doing depcache for: [$definition]"
+      args = ['depcache', "${definition}"]
+    }
+
     def hash = getHash()
     project.jspm?.bundles?.each { bundle, definition ->
       println "Doing bundle for: [$definition] - [$bundle]"
