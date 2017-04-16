@@ -7,4 +7,5 @@ class JspmGrailsExtension
     String packageConfigPath = 'grails-app/jspm'
     String buildDir = 'jspmCompile'
     Map<String, String> bundles
+    Collection<String> depcache
 }
