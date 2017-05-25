@@ -29,6 +29,17 @@ class JspmBundle extends JspmTask
   @Override
   void exec()
   {
+    def configFile = new File("${project.buildDir}/${project.jspm.buildDir}/assets/jspm-config.js")
+    configFile.text = configFile.text + '''
+      System.config({
+        meta: {
+          "inline/*": {
+            "build": false
+          }
+        }
+      });
+    '''
+
     def hash = getHash()
     project.jspm?.bundles?.each { bundle, definition ->
       println "Doing bundle for: [$definition] - [$bundle]"
@@ -37,7 +48,6 @@ class JspmBundle extends JspmTask
     }
 
     //minify config
-    def configFile = new File("${project.buildDir}/${project.jspm.buildDir}/assets/jspm-config.js")
     configFile.text = configFile.text.readLines().collect{ it.trim() }.join('')
   }
 
