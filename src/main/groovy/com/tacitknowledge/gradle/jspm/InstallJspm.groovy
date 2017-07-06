@@ -1,6 +1,6 @@
 package com.tacitknowledge.gradle.jspm
 
-import com.moowork.gradle.node.task.NpmTask
+import com.moowork.gradle.node.npm.NpmTask
 
 class InstallJspm extends NpmTask
 {
