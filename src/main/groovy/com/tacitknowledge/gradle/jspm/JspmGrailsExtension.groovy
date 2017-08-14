@@ -6,5 +6,6 @@ class JspmGrailsExtension
     String loader = 'none'
     String packageConfigPath = 'grails-app/jspm'
     String buildDir = 'jspmCompile'
-    Map<String, String> bundles
+    List<Map> bundles
+    String uid
 }
