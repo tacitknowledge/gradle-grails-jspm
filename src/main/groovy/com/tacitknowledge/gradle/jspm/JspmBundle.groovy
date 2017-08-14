@@ -36,24 +36,37 @@ class JspmBundle extends JspmTask
           "inline/*": {
             "build": false
           }
+        },
+        "baseURL": "../assets",
+        "packages": {
+          "app": {
+            "format": "esm",
+            "defaultExtension": "js",
+            "meta": {
+              "*.js": {
+                "babelOptions": {
+                  "plugins": [
+                    "babel-plugin-transform-react-jsx"
+                  ]
+                }
+              }
+            }
+          }
         }
       });
     '''
 
-    def hash = getHash()
-    project.jspm?.bundles?.each { bundle, definition ->
-      println "Doing bundle for: [$definition] - [$bundle]"
-      args = ['bundle', definition, "../assets/bundles/${bundle}.${hash}.js", '--inject', '--minify']
+
+    project.jspm?.bundles?.each { el ->
+      println "Doing bundle for: [$el.definition] - [$el.bundleName]"
+      args = [el.mode, el.definition, "../assets/bundles/${el.bundleName}.${project.jspm.uid}.js"] + el.args
       super.exec()
     }
 
+    configFile.text = configFile.text.replace("\"/jspm_packages/", "\"/assets/jspm_packages/")
+    configFile.text = configFile.text.replace("\"bundles/", "\"/assets/bundles/")
+
     //minify config
     configFile.text = configFile.text.readLines().collect{ it.trim() }.join('')
-  }
-
-  String getHash() {
-    def digest = DigestUtils.md5Digest;
-    inputFiles.each { digest.update(it.bytes) }
-    Hex.encodeHexString(digest.digest())
   }
 }
